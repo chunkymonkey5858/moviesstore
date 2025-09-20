@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+<div class="p-3">
+  <div class="container">
+    <div class="row mt-3">
+      <div class="col-lg-8 mx-auto">
+        <div class="card">
+          <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+              <h4 class="mb-0">{{ template_data.petition.title }}</h4>
+              <a href="{% url 'movies.petition_list' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Petitions
+              </a>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <h6 class="text-muted">Movie Requested:</h6>
+                <h5>{{ template_data.petition.movie_title }}</h5>
+              </div>
+              <div class="col-md-6">
+                <h6 class="text-muted">Created by:</h6>
+                <p class="mb-0">{{ template_data.petition.creator.username }}</p>
+                <small class="text-muted">{{ template_data.petition.created_at|date:"F d, Y \a\t g:i A" }}</small>
+              </div>
+            </div>
+            
+            <hr>
+            
+            <h6 class="text-muted">Description:</h6>
+            <p class="mb-4">{{ template_data.petition.description }}</p>
+            
+            <div class="row text-center mb-4">
+              <div class="col-4">
+                <div class="border rounded p-3">
+                  <div class="text-success h4 mb-1">{{ template_data.petition.yes_votes }}</div>
+                  <div class="text-muted">Yes Votes</div>
+                </div>
+              </div>
+              <div class="col-4">
+                <div class="border rounded p-3">
+                  <div class="text-danger h4 mb-1">{{ template_data.petition.no_votes }}</div>
+                  <div class="text-muted">No Votes</div>
+                </div>
+              </div>
+              <div class="col-4">
+                <div class="border rounded p-3">
+                  <div class="text-primary h4 mb-1">{{ template_data.petition.total_votes }}</div>
+                  <div class="text-muted">Total Votes</div>
+                </div>
+              </div>
+            </div>
+            
+            {% if messages %}
+              {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                  {{ message }}
+                  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+              {% endfor %}
+            {% endif %}
+            
+            {% if user.is_authenticated %}
+              {% if template_data.user_vote %}
+                <div class="alert alert-info">
+                  <i class="fas fa-info-circle"></i> You voted <strong>{{ template_data.user_vote.vote|title }}</strong> on this petition.
+                </div>
+              {% endif %}
+              
+              <form method="POST" action="{% url 'movies.petition_vote' petition_id=template_data.petition.id %}">
+                {% csrf_token %}
+                <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                  <button type="submit" name="vote" value="yes" class="btn btn-success btn-lg me-2">
+                    <i class="fas fa-thumbs-up"></i> Vote Yes
+                  </button>
+                  <button type="submit" name="vote" value="no" class="btn btn-danger btn-lg">
+                    <i class="fas fa-thumbs-down"></i> Vote No
+                  </button>
+                </div>
+              </form>
+            {% else %}
+              <div class="alert alert-warning text-center">
+                <i class="fas fa-lock"></i> Please <a href="{% url 'accounts.login' %}">login</a> to vote on this petition.
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
